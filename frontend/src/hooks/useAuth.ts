@@ -34,6 +34,9 @@ export const useAuth = () => {
   const login = async (username: string, password: string) => {
     const response = await loginApi(username, password);
     const { access_token } = response;
+    if (!access_token) {
+      throw new Error('用户名或密码错误');
+    }
     setAuthToken(access_token);
     localStorage.setItem('access_token', access_token);
     try {
@@ -47,6 +50,9 @@ export const useAuth = () => {
   const register = async (username: string, email: string, password: string) => {
     const response = await registerApi(username, password, email);
     const { access_token } = response;
+    if (!access_token) {
+      throw new Error('注册失败');
+    }
     setAuthToken(access_token);
     localStorage.setItem('access_token', access_token);
     try {

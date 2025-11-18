@@ -13,5 +13,7 @@ class Settings:
     admin_email: str = os.getenv("ADMIN_EMAIL", "admin@example.com")
     upload_dir: str = os.getenv("UPLOAD_DIR", "backend/app/static/uploads")
     model_path: str = os.getenv("MALWARE_MODEL_PATH", "")
+    register_daily_limit: int = int(os.getenv("REGISTER_DAILY_LIMIT", "3"))
+    register_cooldown_seconds: int = int(os.getenv("REGISTER_COOLDOWN_SECONDS", "60"))
 
 settings = Settings()

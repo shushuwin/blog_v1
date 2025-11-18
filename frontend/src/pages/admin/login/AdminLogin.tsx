@@ -16,7 +16,12 @@ export default function AdminLogin() {
     setLoading(true)
     try {
       const r = await api.post('/api/auth/login', { username, password })
-      setAuthToken(r.data.access_token)
+      const token = r?.data?.access_token
+      if (!token) {
+        setError('登录失败，请检查用户名和密码')
+        return
+      }
+      setAuthToken(token)
       navigate('/admin')
     } catch (e: any) {
       setError(e.response?.data?.detail || '登录失败，请检查用户名和密码')
@@ -113,11 +118,7 @@ export default function AdminLogin() {
             </motion.button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-stone-500">
-              管理员账户：admin / admin
-            </p>
-          </div>
+          
         </div>
       </motion.div>
     </div>

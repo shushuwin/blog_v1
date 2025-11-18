@@ -15,7 +15,7 @@ export default function PostEditor({ mode }: { mode: Mode }) {
   const [password, setPassword] = useState('')
   const [tagsInput, setTagsInput] = useState('')
   const [content, setContent] = useState('')
-  const [cats, setCats] = useState<Array<{id:number; name:string}>>([])
+  const [cats, setCats] = useState<Array<{id:number; name:string; slug:string}>>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -35,17 +35,25 @@ export default function PostEditor({ mode }: { mode: Mode }) {
   async function save() {
     setLoading(true)
     try {
+      const selected = cats.find(c => c.id === categoryId)
+      const tags = tagsInput.split(',').map(s => s.trim()).filter(Boolean)
       if (mode === 'new') {
-        const tags = tagsInput.split(',').map(s => s.trim()).filter(Boolean)
-        const r = await api.post('/api/posts', { title, summary, category_id: categoryId, is_published: isPublished, is_protected: isProtected, password: password || undefined, tags: tags.length ? tags : undefined })
-        const pid = r.data.id
-        if (content) await api.post(`/api/posts/${pid}/markdown`, { content })
+        if (selected?.slug === 'projects') {
+          const pr = await api.post('/api/projects', { name: title, description: summary })
+          const pid = pr.data.id
+          if (content) await api.post(`/api/projects/${pid}/markdown`, { content })
+          navigate('/admin/projects')
+        } else {
+          const r = await api.post('/api/posts', { title, summary, category_id: categoryId, is_published: isPublished, is_protected: isProtected, password: password || undefined, tags: tags.length ? tags : undefined })
+          const pid = r.data.id
+          if (content) await api.post(`/api/posts/${pid}/markdown`, { content })
+          navigate('/admin')
+        }
       } else if (id) {
-        const tags = tagsInput.split(',').map(s => s.trim()).filter(Boolean)
         await api.put(`/api/posts/${id}`, { title, summary, category_id: categoryId, is_published: isPublished, is_protected: isProtected, password: password || undefined, tags: tags.length ? tags : [] })
         if (content) await api.post(`/api/posts/${id}/markdown`, { content })
+        navigate('/admin')
       }
-      navigate('/admin')
     } finally {
       setLoading(false)
     }

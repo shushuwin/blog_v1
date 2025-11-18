@@ -56,7 +56,7 @@ const HomePage: React.FC = () => {
                 CYBER
               </motion.h1>
               <motion.h2 
-                className="text-4xl md:text-6xl font-light text-white/90 mt-2"
+                className="text-4xl md:text-6xl font-light bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mt-2"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
@@ -66,14 +66,14 @@ const HomePage: React.FC = () => {
             </div>
             
             <motion.p 
-              className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto mb-12 leading-relaxed"
+              className="text-xl md:text-2xl text-stone-700 max-w-3xl mx-auto mb-12 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
               探索网络安全的无限维度，在数字世界的边缘寻找真相
               <br />
-              <span className="text-cyan-400">// where security meets infinity</span>
+              <span className="text-cyan-500">// where security meets infinity</span>
             </motion.p>
             
             <motion.div 

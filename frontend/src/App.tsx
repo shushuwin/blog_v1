@@ -25,6 +25,8 @@ import NavbarNew from './components/Navbar-new'
 import PostsList from './pages/posts/PostsList'
 import PostDetail from './pages/posts/PostDetail'
 import TagsList from './pages/tags/TagsList'
+import ProjectManager from './pages/admin/projects/ProjectManager'
+import ProjectEditor from './pages/admin/projects/ProjectEditor'
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation()
@@ -62,8 +64,8 @@ export default function App() {
         <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="/life" element={<LifeList />} />
         <Route path="/life/:id" element={<LifeDetail />} />
-        <Route path="/tools" element={<ToolsList />} />
-        <Route path="/tools/malware-scan" element={<MalwareScan />} />
+        <Route path="/tools" element={<ProtectedRoute requireAdmin={false}><ToolsList /></ProtectedRoute>} />
+        <Route path="/tools/malware-scan" element={<ProtectedRoute requireAdmin={false}><MalwareScan /></ProtectedRoute>} />
         <Route path="/tags" element={<TagsList />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -72,6 +74,9 @@ export default function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/posts/new" element={<ProtectedRoute><AdminLayout><PostEditor mode="new" /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/posts/edit/:id" element={<ProtectedRoute><AdminLayout><PostEditor mode="edit" /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/projects" element={<ProtectedRoute><AdminLayout><ProjectManager /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/projects/new" element={<ProtectedRoute><AdminLayout><ProjectEditor mode="new" /></AdminLayout></ProtectedRoute>} />
+        <Route path="/admin/projects/edit/:id" element={<ProtectedRoute><AdminLayout><ProjectEditor mode="edit" /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/users" element={<ProtectedRoute><AdminLayout><UserManager /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute><AdminLayout><Settings /></AdminLayout></ProtectedRoute>} />
         <Route path="/admin/import/markdown" element={<ProtectedRoute><AdminLayout><MarkdownImport /></AdminLayout></ProtectedRoute>} />

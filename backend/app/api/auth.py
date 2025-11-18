@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from ..utils.database import get_db
 from ..schemas.auth import LoginRequest, RegisterRequest, TokenResponse
@@ -7,6 +7,8 @@ from ..core.config import settings
 from ..core.security import get_current_user
 from ..models.user import User
 from fastapi import HTTPException
+from datetime import datetime
+from ..models.signup_attempt import SignupAttempt
 import bcrypt
 
 router = APIRouter()
@@ -50,7 +52,17 @@ def author(db: Session = Depends(get_db)):
     }
 
 @router.post('/register', response_model=TokenResponse)
-def register(data: RegisterRequest, db: Session = Depends(get_db)):
+def register(data: RegisterRequest, request: Request, db: Session = Depends(get_db)):
+    ip = (request.client.host or "unknown") if request and request.client else "unknown"
+    now = datetime.utcnow()
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    cnt = db.query(SignupAttempt).filter(SignupAttempt.ip_address == ip, SignupAttempt.created_at >= start).count()
+    if cnt >= settings.register_daily_limit:
+        raise HTTPException(status_code=429, detail="当前IP注册次数过多，请稍后再试")
+    last = db.query(SignupAttempt).filter(SignupAttempt.ip_address == ip).order_by(SignupAttempt.created_at.desc()).first()
+    if last:
+        if (now - last.created_at).total_seconds() < settings.register_cooldown_seconds:
+            raise HTTPException(status_code=429, detail="操作太频繁，请稍后再试")
     exists = db.query(User).filter(User.username == data.username).first()
     if exists:
         raise HTTPException(status_code=400, detail="用户名已存在")
@@ -62,6 +74,8 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     db.add(u)
     db.commit()
     db.refresh(u)
+    db.add(SignupAttempt(ip_address=ip))
+    db.commit()
     token = authenticate(db, data.username, data.password)
     if not token:
         raise HTTPException(status_code=500, detail="注册后登录失败")
